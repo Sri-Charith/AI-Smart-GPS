@@ -118,3 +118,131 @@ exports.addGuard = async (req, res) => {
         res.status(500).json({ message: 'Failed to add guard', error: err.message });
     }
 };
+
+// 📋 Get All Students
+exports.getAllStudents = async (req, res) => {
+    try {
+        const students = await Student.find({}, '-password -embedding');
+        res.status(200).json(students);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch students', error: err.message });
+    }
+};
+
+// 📋 Get All Departments
+exports.getAllDepartments = async (req, res) => {
+    try {
+        const departments = await Department.find({}, '-password');
+        res.status(200).json(departments);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch departments', error: err.message });
+    }
+};
+
+// 📋 Get All Guards
+exports.getAllGuards = async (req, res) => {
+    try {
+        const guards = await Guard.find({}, '-password');
+        res.status(200).json(guards);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch guards', error: err.message });
+    }
+};
+
+// 🗑 Delete Student
+exports.deleteStudent = async (req, res) => {
+    try {
+        await Student.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Student deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete student', error: err.message });
+    }
+};
+
+// 🗑 Delete Department
+exports.deleteDepartment = async (req, res) => {
+    try {
+        await Department.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Department deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete department', error: err.message });
+    }
+};
+
+// 🗑 Delete Guard
+exports.deleteGuard = async (req, res) => {
+    try {
+        await Guard.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Guard deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete guard', error: err.message });
+    }
+};
+
+// 🔄 Update Student
+exports.updateStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const student = await Student.findById(id);
+        if (!student) return res.status(404).json({ message: 'Student not found' });
+
+        const { studentId, name, year, branch, section, password } = req.body;
+        const file = req.file;
+
+        if (studentId) student.studentId = studentId;
+        if (name) student.name = name;
+        if (year) student.year = year;
+        if (branch) student.branch = branch;
+        if (section) student.section = section;
+        if (password) student.password = password;
+
+        if (file) {
+            const uploadRes = await cloudinary.uploader.upload(file.path);
+            student.imageUrl = uploadRes.secure_url;
+            student.embedding = await extractEmbedding(student.imageUrl);
+        }
+
+        await student.save();
+        res.status(200).json({ message: 'Student updated successfully', student });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to update student', error: err.message });
+    }
+};
+
+// 🔄 Update Department
+exports.updateDepartment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dept = await Department.findById(id);
+        if (!dept) return res.status(404).json({ message: 'Department not found' });
+
+        const { deptId, name, password } = req.body;
+        if (deptId) dept.deptId = deptId;
+        if (name) dept.name = name;
+        if (password) dept.password = password;
+
+        await dept.save();
+        res.status(200).json({ message: 'Department updated successfully', dept });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to update department', error: err.message });
+    }
+};
+
+// 🔄 Update Guard
+exports.updateGuard = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const guard = await Guard.findById(id);
+        if (!guard) return res.status(404).json({ message: 'Guard not found' });
+
+        const { guardId, name, password } = req.body;
+        if (guardId) guard.guardId = guardId;
+        if (name) guard.name = name;
+        if (password) guard.password = password;
+
+        await guard.save();
+        res.status(200).json({ message: 'Guard updated successfully', guard });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to update guard', error: err.message });
+    }
+};
