@@ -16,7 +16,11 @@ const AdminSignup = () => {
         setLoading(true);
         setError('');
         try {
-            const { data } = await api.post('/auth/signup', { role: 'admin', id: name, password });
+            const { data } = await api.post('/auth/signup', {
+                role: 'admin',
+                id: name.trim(),
+                password: password.trim()
+            });
             localStorage.setItem('adminToken', data.token);
             localStorage.setItem('adminData', JSON.stringify(data.user));
             navigate('/admin/dashboard');

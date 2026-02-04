@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminSignup from './pages/Admin/AdminSignup';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -16,6 +17,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
         {/* Universal Login (Single Page) */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -55,9 +59,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Redirect Root to Portal */}
-        <Route path="/" element={<Navigate to="/admin/login" />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />

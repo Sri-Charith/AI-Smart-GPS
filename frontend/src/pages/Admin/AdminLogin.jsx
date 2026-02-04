@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { Lock, User, Shield, Building2, GraduationCap, Loader2, ChevronRight } from 'lucide-react';
@@ -18,12 +18,25 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Reset form when role changes
+    useEffect(() => {
+        setFormData({ id: '', password: '', name: '', branch: '', year: '', section: '' });
+        setError('');
+    }, [role]);
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        console.log(`🚀 Initiating login for role: ${role}`, formData);
         try {
-            const payload = { role, ...formData };
+            // Trim all fields in formData
+            const trimmedFormData = Object.keys(formData).reduce((acc, key) => {
+                acc[key] = typeof formData[key] === 'string' ? formData[key].trim() : formData[key];
+                return acc;
+            }, {});
+
+            const payload = { role, ...trimmedFormData };
             const { data } = await api.post('/auth/login', payload);
 
             localStorage.setItem(`${role}Token`, data.token);
@@ -66,8 +79,8 @@ const Login = () => {
                             key={r.id}
                             onClick={() => { setRole(r.id); setError(''); }}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold ${role === r.id
-                                    ? 'bg-indigo-600 text-white shadow-lg'
-                                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                 }`}
                         >
                             <r.icon size={20} />
@@ -136,14 +149,18 @@ const Login = () => {
                                         onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                                         required
                                     />
-                                    <input
-                                        type="text"
-                                        placeholder="Year"
+                                    <select
                                         className="bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white focus:ring-2 focus:ring-indigo-500/50 outline-none"
                                         value={formData.year}
                                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                                         required
-                                    />
+                                    >
+                                        <option value="" disabled className="bg-[#1a1a2e]">Year</option>
+                                        <option value="1" className="bg-[#1a1a2e]">1st Year</option>
+                                        <option value="2" className="bg-[#1a1a2e]">2nd Year</option>
+                                        <option value="3" className="bg-[#1a1a2e]">3rd Year</option>
+                                        <option value="4" className="bg-[#1a1a2e]">4th Year</option>
+                                    </select>
                                     <input
                                         type="text"
                                         placeholder="Sec"

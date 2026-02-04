@@ -18,7 +18,8 @@ import {
     Shield,
     Pencil,
     Trash2,
-    X
+    X,
+    ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -620,18 +621,32 @@ const AdminDashboard = () => {
 
                             {activeTab === 'add-student' && (
                                 <div className="glass-card p-10 border border-white/5 shadow-2xl">
-                                    <div className="mb-10 text-center relative">
+                                    <div className="mb-10 flex items-center justify-between border-b border-white/5 pb-6">
+                                        <div className="flex items-center gap-4">
+                                            {isEditing && (
+                                                <button
+                                                    onClick={() => {
+                                                        setIsEditing(false);
+                                                        setEditId(null);
+                                                        setStudentData({ studentId: '', name: '', year: '', branch: '', section: '', password: '', photo: null });
+                                                        setActiveTab('view-students');
+                                                    }}
+                                                    className="p-2 hover:bg-white/10 rounded-xl text-slate-400 group flex items-center gap-2 transition-all"
+                                                >
+                                                    <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                                                    <span className="text-sm font-medium">Back</span>
+                                                </button>
+                                            )}
+                                            <div>
+                                                <h2 className="text-3xl font-bold mb-1">{isEditing ? 'Edit Student Profile' : 'Student Registration'}</h2>
+                                                <p className="text-slate-400 text-sm">{isEditing ? `Modifying records for ${studentData.name}` : 'Add a new student to the system with biometrics.'}</p>
+                                            </div>
+                                        </div>
                                         {isEditing && (
-                                            <button
-                                                onClick={() => { setIsEditing(false); setEditId(null); setStudentData({ studentId: '', name: '', year: '', branch: '', section: '', password: '', photo: null }); }}
-                                                className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full text-slate-400"
-                                                title="Cancel Edit"
-                                            >
-                                                <X size={20} />
-                                            </button>
+                                            <div className="px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest">
+                                                Edit Mode
+                                            </div>
                                         )}
-                                        <h2 className="text-3xl font-bold mb-2">{isEditing ? 'Update Student' : 'Student Registration'}</h2>
-                                        <p className="text-slate-400">{isEditing ? `Modifying details for ${studentData.name}` : 'Add a new student to the system with biometrics.'}</p>
                                     </div>
                                     <form onSubmit={handleSubmitStudent} className="space-y-8 max-w-3xl mx-auto">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -746,18 +761,27 @@ const AdminDashboard = () => {
 
                             {activeTab === 'add-dept' && (
                                 <div className="glass-card p-10 border border-white/5 shadow-2xl max-w-2xl mx-auto">
-                                    <div className="mb-10 text-center relative">
-                                        {isEditing && (
-                                            <button
-                                                onClick={() => { setIsEditing(false); setEditId(null); setDeptData({ deptId: '', name: '', password: '' }); }}
-                                                className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full text-slate-400"
-                                                title="Cancel Edit"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        )}
-                                        <h2 className="text-3xl font-bold mb-2">{isEditing ? 'Update Department' : 'New Department'}</h2>
-                                        <p className="text-slate-400">{isEditing ? `Editing ${deptData.name}` : 'Register a new academic or administrative department.'}</p>
+                                    <div className="mb-10 flex items-center justify-between border-b border-white/5 pb-6">
+                                        <div className="flex items-center gap-4">
+                                            {isEditing && (
+                                                <button
+                                                    onClick={() => {
+                                                        setIsEditing(false);
+                                                        setEditId(null);
+                                                        setDeptData({ deptId: '', name: '', password: '' });
+                                                        setActiveTab('view-depts');
+                                                    }}
+                                                    className="p-2 hover:bg-white/10 rounded-xl text-slate-400 group flex items-center gap-2 transition-all"
+                                                >
+                                                    <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                                                    <span className="text-sm font-medium">Back</span>
+                                                </button>
+                                            )}
+                                            <div>
+                                                <h2 className="text-3xl font-bold mb-1">{isEditing ? 'Modify Department' : 'New Department'}</h2>
+                                                <p className="text-slate-400 text-sm">{isEditing ? `Editing ${deptData.name}` : 'Register a new academic or administrative department.'}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                     <form onSubmit={handleSubmitDept} className="space-y-6">
                                         <div className="space-y-2">
@@ -808,18 +832,27 @@ const AdminDashboard = () => {
 
                             {activeTab === 'add-guard' && (
                                 <div className="glass-card p-10 border border-white/5 shadow-2xl max-w-2xl mx-auto">
-                                    <div className="mb-10 text-center relative">
-                                        {isEditing && (
-                                            <button
-                                                onClick={() => { setIsEditing(false); setEditId(null); setGuardData({ guardId: '', name: '', password: '' }); }}
-                                                className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full text-slate-400"
-                                                title="Cancel Edit"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        )}
-                                        <h2 className="text-3xl font-bold mb-2">{isEditing ? 'Update Guard' : 'New Security Personnel'}</h2>
-                                        <p className="text-slate-400">{isEditing ? `Editing ${guardData.name}` : 'Add a security officer to the campus gate monitoring team.'}</p>
+                                    <div className="mb-10 flex items-center justify-between border-b border-white/5 pb-6">
+                                        <div className="flex items-center gap-4">
+                                            {isEditing && (
+                                                <button
+                                                    onClick={() => {
+                                                        setIsEditing(false);
+                                                        setEditId(null);
+                                                        setGuardData({ guardId: '', name: '', password: '' });
+                                                        setActiveTab('view-guards');
+                                                    }}
+                                                    className="p-2 hover:bg-white/10 rounded-xl text-slate-400 group flex items-center gap-2 transition-all"
+                                                >
+                                                    <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                                                    <span className="text-sm font-medium">Back</span>
+                                                </button>
+                                            )}
+                                            <div>
+                                                <h2 className="text-3xl font-bold mb-1">{isEditing ? 'Update Security Personnel' : 'New Security Personnel'}</h2>
+                                                <p className="text-slate-400 text-sm">{isEditing ? `Editing ${guardData.name}` : 'Add a security officer to the campus gate monitoring team.'}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                     <form onSubmit={handleSubmitGuard} className="space-y-6">
                                         <div className="space-y-2">
