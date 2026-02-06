@@ -1,4 +1,11 @@
+# Ignore entire virtual environment
+python-gps/
+
+# Just in case
+site-packages/
+
 # Logs
+
 logs
 *.log
 npm-debug.log*
@@ -27,3 +34,23 @@ node_modules/
 .env
 .env.save
 uploads/
+
+# Python virtual environment
+python-gps/Lib/
+python-gps/Scripts/
+python-gps/Include/
+python-gps/pyenv.cfg
+python-gps/__pycache__/
+python-gps/*.pyc
+python-gps/student_embeddings.json
+
+
+Lib/
+Scripts/
+Include/
+pyvenv.cfg
+__pycache__/
+*.pyc
+student_embeddings.json
+output.txt
+ff08c0f508ad7077eb6ed1990898840c952b3a
