@@ -1,9 +1,3 @@
-# Ignore entire virtual environment
-python-gps/
-
-# Just in case
-site-packages/
-
 # Logs
 
 logs
