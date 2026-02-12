@@ -10,9 +10,11 @@ const {
 } = require('../controllers/guardController');
 
 const authenticateToken = require('../middleware/authMiddleware');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 // All these routes are for Guard role
-router.post('/verify-face', verifyFace);
+router.post('/verify-face', upload.single('image'), verifyFace);
 router.get('/requests', authenticateToken, getAllRequestsForGuard);
 router.delete('/delete/:id', authenticateToken, deleteRequest);
 router.get('/me', authenticateToken, getGuardProfile);

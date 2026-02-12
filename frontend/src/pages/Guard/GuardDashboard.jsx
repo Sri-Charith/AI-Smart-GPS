@@ -78,7 +78,7 @@ const GuardDashboard = () => {
     }, [cameraActive, stream]);
 
     const captureAndVerify = async () => {
-        if (!videoRef.current || !canvasRef.current) return;
+        if (!videoRef.current || !canvasRef.current || scanLoading) return;
 
         setScanLoading(true);
         const canvas = canvasRef.current;
@@ -88,16 +88,17 @@ const GuardDashboard = () => {
         canvas.getContext('2d').drawImage(video, 0, 0);
 
         try {
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
             const file = new File([blob], "scan.jpg", { type: "image/jpeg" });
 
             const formData = new FormData();
             formData.append('image', file);
 
-            const uploadRes = await api.post('/upload/photo', formData);
-            const imageUrl = uploadRes.data.imageUrl;
+            // FAST PATH: Post raw image directly to verification
+            const verifyRes = await api.post('/guard/verify-face', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
 
-            const verifyRes = await api.post('/guard/verify-face', { scannedImageUrl: imageUrl });
             setScanResult({ success: true, ...verifyRes.data });
             fetchRequests();
             setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString() }, ...prev]);
@@ -110,7 +111,7 @@ const GuardDashboard = () => {
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file || scanLoading) return;
 
         setScanLoading(true);
         setScanResult(null);
@@ -119,12 +120,12 @@ const GuardDashboard = () => {
             const formData = new FormData();
             formData.append('image', file);
 
-            const uploadRes = await api.post('/upload/photo', formData);
-            const imageUrl = uploadRes.data.imageUrl;
+            // FAST PATH: Post raw image directly to verification
+            const verifyRes = await api.post('/guard/verify-face', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
 
-            const verifyRes = await api.post('/guard/verify-face', { scannedImageUrl: imageUrl });
             setScanResult({ success: true, ...verifyRes.data });
-
             fetchRequests();
             setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString() }, ...prev]);
         } catch (err) {

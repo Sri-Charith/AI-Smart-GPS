@@ -25,27 +25,48 @@ const path = require('path');
 
 exports.verifyFace = async (req, res) => {
   const { scannedImageUrl } = req.body;
+  const imageFile = req.file;
 
   try {
     const todayIST = getTodayInIST();
-    // 1. Get embedding of scanned image using Python
-    const scriptPath = path.join(__dirname, '..', '..', 'python-gps', 'verify_face_fast.py');
-    const result = spawnSync('python', [scriptPath, scannedImageUrl]);
+    let embedding;
 
-    if (!result.stdout) {
-      console.error("❌ Python script error:", result.stderr?.toString() || "Unknown error");
-      return res.status(500).json({ message: 'AI Engine failed. Check server logs.' });
+    if (imageFile) {
+      // High-Speed Path: Send bytes directly to FastAPI
+      const formData = new FormData();
+      const blob = new Blob([imageFile.buffer], { type: imageFile.mimetype });
+      formData.append('file', blob, imageFile.originalname);
+
+      const aiRes = await fetch('http://127.0.0.1:8000/extract-embedding', {
+        method: 'POST',
+        body: formData
+      });
+      const aiData = await aiRes.json();
+
+      if (aiData.error) throw new Error(aiData.error);
+      embedding = aiData.embedding;
+      console.log("⚡ Fast-Path Embedding Extracted");
+    } else if (scannedImageUrl) {
+      // Compatibility Path: Send URL to FastAPI
+      const aiRes = await fetch('http://127.0.0.1:8000/extract-embedding-from-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: scannedImageUrl })
+      });
+      const aiData = await aiRes.json();
+
+      if (aiData.error) throw new Error(aiData.error);
+      embedding = aiData.embedding;
+      console.log("📡 URL-Path Embedding Extracted");
+    } else {
+      return res.status(400).json({ message: 'No image source provided' });
     }
 
-    const output = result.stdout.toString();
-    console.log("🤖 AI Script Output:", output);
-    const parsed = JSON.parse(output);
-
-    if (!parsed.embedding) {
-      return res.status(400).json({ message: 'Failed to extract face embedding', error: parsed.error });
+    if (!embedding) {
+      return res.status(400).json({ message: 'Failed to extract face embedding' });
     }
 
-    const scannedEmbedding = parsed.embedding;
+    const scannedEmbedding = embedding;
 
     // 2. Get approved students with embeddings
     const approvedRequests = await GatePassRequest.find({

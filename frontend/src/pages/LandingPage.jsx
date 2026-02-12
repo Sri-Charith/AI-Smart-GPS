@@ -53,7 +53,10 @@ const LandingPage = () => {
                         <div className="w-10 h-10 neon-bg-indigo rounded-xl flex items-center justify-center">
                             <Shield className="text-white" size={24} />
                         </div>
-                        <span className="text-2xl font-black tracking-tighter text-white uppercase italic">SmartGate <span className="text-indigo-500">AI</span></span>
+                        <span className="text-2xl font-black tracking-tighter text-white uppercase italic [word-spacing:0.5rem]">
+  Automated <span className="text-indigo-500">AI</span> Smart Gate Pass System
+</span>
+
                     </div>
                     <motion.button
                         whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(99, 102, 241, 0.4)" }}
