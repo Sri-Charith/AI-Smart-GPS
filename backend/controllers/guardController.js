@@ -1,8 +1,8 @@
 const Guard = require('../models/Guard');
 const GatePassRequest = require('../models/GatePassRequest');
 
-// ✅ Helper: Get current IST datetime
-function getISTNow() {
+// ✅ Helper: Get current IST date parts
+function getISTDateInfo() {
   const now = new Date();
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Asia/Kolkata',
@@ -21,32 +21,31 @@ function getISTNow() {
   const year = findPart('year');
   const month = findPart('month');
   const day = findPart('day');
-  const hour = findPart('hour');
-  const minute = findPart('minute');
-  const second = findPart('second');
 
-  return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+  return {
+    todayStr: `${year}-${month}-${day}`, // "YYYY-MM-DD"
+    fullIST: `${day}/${month}/${year} ${findPart('hour')}:${findPart('minute')}`
+  };
 }
 
-// ✅ Main handler: Fetch today's requests between 9:30 AM and 5:30 PM IST
+// ✅ Main handler: Fetch all approved requests
 exports.getAllRequestsForGuard = async (req, res) => {
   try {
-    const nowIST = getISTNow();
+    const { filter } = req.query;
+    const isHistory = filter === 'checked';
+    const { fullIST } = getISTDateInfo();
 
-    const todayStr = nowIST.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    console.log(`📡 Fetching Requests (IST: ${fullIST}, Tab: ${filter})`);
 
-    console.log("⏰ IST Now      :", nowIST.toLocaleString('en-IN'));
-    console.log("📅 Fetching for :", todayStr);
+    const query = isHistory
+      ? { status: 'Left Campus' }
+      : { status: 'Approved', leftAt: null };
 
-    const requests = await GatePassRequest.find({
-      status: 'Approved',
-      leftAt: null,
-      date: todayStr
-    })
+    const requests = await GatePassRequest.find(query)
       .populate('student', 'studentId name branch year section imageUrl')
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
 
-    console.log("✅ Requests fetched:", requests.length);
+    console.log(`✅ ${isHistory ? 'HISTORY' : 'ACTIVE'} FETCHED:`, requests.length);
     res.status(200).json({ requests });
   } catch (error) {
     console.error('❌ Error in getAllRequestsForGuard:', error.message);

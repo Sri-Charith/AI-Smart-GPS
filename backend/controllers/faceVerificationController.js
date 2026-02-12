@@ -18,8 +18,8 @@ function cosineSimilarity(vec1, vec2) {
 }
 
 // Threshold (for VGG-Face with cosine similarity)
-// 0.4-0.5 is usually good for real-word conditions
-const SIMILARITY_THRESHOLD = 0.5;
+// 0.4 is a balanced threshold for accuracy and consistency
+const SIMILARITY_THRESHOLD = 0.4;
 
 const path = require('path');
 
@@ -31,7 +31,14 @@ exports.verifyFace = async (req, res) => {
     // 1. Get embedding of scanned image using Python
     const scriptPath = path.join(__dirname, '..', '..', 'python-gps', 'verify_face_fast.py');
     const result = spawnSync('python', [scriptPath, scannedImageUrl]);
+
+    if (!result.stdout) {
+      console.error("❌ Python script error:", result.stderr?.toString() || "Unknown error");
+      return res.status(500).json({ message: 'AI Engine failed. Check server logs.' });
+    }
+
     const output = result.stdout.toString();
+    console.log("🤖 AI Script Output:", output);
     const parsed = JSON.parse(output);
 
     if (!parsed.embedding) {
@@ -43,8 +50,7 @@ exports.verifyFace = async (req, res) => {
     // 2. Get approved students with embeddings
     const approvedRequests = await GatePassRequest.find({
       status: 'Approved',
-      leftAt: null,
-      date: todayIST
+      leftAt: null
     }).populate('student');
 
     let bestMatch = null;

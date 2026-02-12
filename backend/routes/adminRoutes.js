@@ -14,7 +14,8 @@ const {
     deleteGuard,
     updateStudent,
     updateDepartment,
-    updateGuard
+    updateGuard,
+    refreshStudentEmbedding
 } = require('../controllers/adminController');
 const authenticateToken = require('../middleware/authMiddleware');
 
@@ -44,5 +45,8 @@ router.delete('/guard/:id', authenticateToken, deleteGuard);
 router.put('/student/:id', authenticateToken, upload.single('photo'), updateStudent);
 router.put('/department/:id', authenticateToken, updateDepartment);
 router.put('/guard/:id', authenticateToken, updateGuard);
+
+// AI Recalibration
+router.post('/student/:id/refresh-embedding', authenticateToken, refreshStudentEmbedding);
 
 module.exports = router;

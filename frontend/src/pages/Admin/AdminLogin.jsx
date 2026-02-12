@@ -37,6 +37,12 @@ const Login = () => {
             const payload = { role, ...trimmedFormData };
             const { data } = await api.post('/auth/login', payload);
 
+            // Clear old tokens for other roles to prevent collision
+            ['admin', 'student', 'department', 'guard'].forEach(r => {
+                localStorage.removeItem(`${r}Token`);
+                localStorage.removeItem(`${r}Data`);
+            });
+
             localStorage.setItem(`${role}Token`, data.token);
             localStorage.setItem(`${role}Data`, JSON.stringify(data.user));
 

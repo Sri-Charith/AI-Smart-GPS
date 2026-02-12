@@ -136,7 +136,7 @@ exports.addGuard = async (req, res) => {
 // 📋 Get All Students
 exports.getAllStudents = async (req, res) => {
     try {
-        const students = await Student.find({}, '-password -embedding');
+        const students = await Student.find({}, '-password');
         res.status(200).json(students);
     } catch (err) {
         res.status(500).json({ message: 'Failed to fetch students', error: err.message });
@@ -265,5 +265,30 @@ exports.updateGuard = async (req, res) => {
     } catch (err) {
         console.error("🔥 Error updating guard:", err.message);
         res.status(500).json({ message: 'Failed to update guard', error: err.message });
+    }
+};
+
+// 🔄 Refresh Student Embedding (AI Backfill)
+exports.refreshStudentEmbedding = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const student = await Student.findById(id);
+        if (!student) return res.status(404).json({ message: 'Student not found' });
+        if (!student.imageUrl) return res.status(400).json({ message: 'No photo found for this student to analyze' });
+
+        console.log(`🤖 Re-analyzing face for: ${student.name} (${student.studentId})`);
+        const embedding = await extractEmbedding(student.imageUrl);
+
+        if (!embedding) {
+            return res.status(500).json({ message: 'AI Analysis failed. Please check the photo quality.' });
+        }
+
+        student.embedding = embedding;
+        await student.save();
+
+        res.status(200).json({ message: 'AI Face Data recalibrated successfully', student });
+    } catch (err) {
+        console.error("🔥 Error refreshing embedding:", err.message);
+        res.status(500).json({ message: 'Failed to refresh face data', error: err.message });
     }
 };

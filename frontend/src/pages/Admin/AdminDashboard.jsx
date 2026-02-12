@@ -8,22 +8,25 @@ import {
     Plus,
     LogOut,
     Upload,
-    Loader2,
-    CheckCircle2,
-    LayoutDashboard,
-    Search,
-    RefreshCw,
-    UserPlus,
-    Building,
+    Lock,
+    User,
     Shield,
+    GraduationCap,
+    Loader2,
+    ChevronRight,
+    Activity,
+    Skull,
+    Zap,
+    CheckCircle2,
+    Search,
     Pencil,
     Trash2,
-    X,
     ChevronLeft,
-    Zap,
-    Skull,
-    Target,
-    Activity
+    RefreshCcw,
+    AlertTriangle,
+    LayoutGrid,
+    UserPlus,
+    Building
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +37,7 @@ const AdminDashboard = () => {
     const [guards, setGuards] = useState([]);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [refreshingId, setRefreshingId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
@@ -85,15 +89,34 @@ const AdminDashboard = () => {
     };
 
     const handleDelete = async (role, id) => {
-        if (!window.confirm(`Delete this ${role}?`)) return;
+        if (window.confirm(`Are you sure you want to delete this ${role}?`)) {
+            try {
+                const endpoint = role === 'dept' ? `/ admin / department / ${id} ` : ` / admin / ${role}/${id}`;
+                await api.delete(endpoint);
+                showSuccess(`${role === 'dept' ? 'HOD' : role.charAt(0).toUpperCase() + role.slice(1)} removed from system.`);
+                if (role === 'student') fetchStudents();
+                else if (role === 'dept') fetchDepartments();
+                else fetchGuards();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const handleRefreshEmbedding = async (studentId) => {
+        setRefreshingId(studentId);
+        console.log(`🔄 Triggering AI Re-analysis for student: ${studentId}`);
         try {
-            const endpoint = role === 'dept' ? `/admin/department/${id}` : `/admin/${role}/${id}`;
-            await api.delete(endpoint);
-            showSuccess(`${role.toUpperCase()} record deleted.`);
-            if (role === 'student') fetchStudents();
-            if (role === 'dept') fetchDepartments();
-            if (role === 'guard') fetchGuards();
-        } catch (err) { alert('Delete failed.'); }
+            const res = await api.post(`/admin/student/${studentId}/refresh-embedding`);
+            console.log("✅ AI Analysis response:", res.data);
+            showSuccess('AI Face Data recalibrated successfully.');
+            await fetchStudents(); // Ensure we wait for the refetch
+        } catch (err) {
+            console.error("❌ AI Refresh failed:", err);
+            alert(err.response?.data?.message || 'Failed to refresh AI data');
+        } finally {
+            setRefreshingId(null);
+        }
     };
 
     const startEditStudent = (student) => {
@@ -185,7 +208,7 @@ const AdminDashboard = () => {
     };
 
     const tabs = [
-        { id: 'overview', name: 'Dashboard Overview', icon: LayoutDashboard },
+        { id: 'overview', name: 'Dashboard Overview', icon: LayoutGrid },
         { id: 'view-students', name: 'Student List', icon: Users },
         { id: 'add-student', name: editingStudentId ? 'Edit Student' : 'Add Student', icon: UserPlus },
         { id: 'view-depts', name: 'HOD List', icon: Building2 },
@@ -347,7 +370,7 @@ const AdminDashboard = () => {
                                             <th className="pb-4 pl-6">Student</th>
                                             <th className="pb-4">Branch</th>
                                             <th className="pb-4">Year/Sec</th>
-                                            <th className="pb-4">Password</th>
+                                            <th className="pb-4">AI Status</th>
                                             <th className="pb-4 pr-6 text-right">Actions</th>
                                         </tr>
                                     </thead>
@@ -371,9 +394,25 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td className="text-xs font-black uppercase tracking-widest text-slate-400">{s.branch}</td>
                                                 <td className="text-xs font-black uppercase tracking-widest text-slate-400">{s.year} - {s.section}</td>
-                                                <td className="text-[10px] font-mono text-slate-600">••••••••</td>
+                                                <td className="py-6">
+                                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${(s.embedding && Array.isArray(s.embedding) && s.embedding.length > 0) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
+                                                        {(s.embedding && Array.isArray(s.embedding) && s.embedding.length > 0) ? (
+                                                            <><CheckCircle2 size={10} /> Face Ready</>
+                                                        ) : (
+                                                            <><AlertTriangle size={10} /> Missing Data</>
+                                                        )}
+                                                    </div>
+                                                </td>
                                                 <td className="py-6 px-6 last:rounded-r-[2rem] text-right">
                                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                        <button
+                                                            onClick={() => handleRefreshEmbedding(s._id)}
+                                                            disabled={refreshingId === s._id}
+                                                            title="Refresh AI Face Data"
+                                                            className={`p-3 rounded-xl transition-all ${refreshingId === s._id ? 'bg-white/5 text-slate-600' : 'bg-white/5 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400'}`}
+                                                        >
+                                                            {refreshingId === s._id ? <Loader2 size={18} className="animate-spin" /> : <RefreshCcw size={18} />}
+                                                        </button>
                                                         <button onClick={() => startEditStudent(s)} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all"><Pencil size={18} /></button>
                                                         <button onClick={() => handleDelete('student', s._id)} className="p-3 bg-white/5 hover:bg-rose-500/10 rounded-xl text-slate-400 hover:text-rose-500 transition-all"><Trash2 size={18} /></button>
                                                     </div>

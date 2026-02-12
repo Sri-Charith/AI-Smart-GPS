@@ -57,7 +57,7 @@ const loginStudent = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { studentId: student.studentId, id: student._id },
+      { id: student._id, studentId: student.studentId, role: 'student' },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -83,9 +83,16 @@ const loginStudent = async (req, res) => {
 
 const getDashboard = async (req, res) => {
   try {
+    if (!req.student || !req.student.id) {
+      return res.status(401).json({ message: 'Unauthorized: Student context missing' });
+    }
     const student = await Student.findById(req.student.id).select('-password');
+    if (!student) {
+      return res.status(404).json({ message: 'Student details not found' });
+    }
     res.json({ student });
   } catch (error) {
+    console.error("🔥 Dashboard Fetch Error:", error.message);
     res.status(500).json({ message: 'Failed to fetch dashboard', error: error.message });
   }
 };

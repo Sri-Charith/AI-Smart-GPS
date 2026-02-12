@@ -55,12 +55,16 @@ exports.sendGatePassRequest = async (req, res) => {
 // View student request status
 exports.viewStatus = async (req, res) => {
   try {
+    if (!req.student || !req.student.id) {
+      return res.status(401).json({ message: 'Unauthorized: Student context missing' });
+    }
     const studentId = req.student.id;
     const requests = await GatePassRequest.find({ student: studentId })
       .populate('student', 'studentId name branch year section imageUrl')
       .sort({ createdAt: -1 });
     res.status(200).json({ requests });
   } catch (error) {
+    console.error("🔥 GatePass Status View Error:", error.message);
     res.status(500).json({ message: 'Error fetching request status', error: error.message });
   }
 };
