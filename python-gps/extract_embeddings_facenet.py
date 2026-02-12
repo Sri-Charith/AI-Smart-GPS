@@ -1,16 +1,19 @@
-# extract_embeddings_facenet.py
 from deepface import DeepFace
 import pymongo
 import requests
 from io import BytesIO
 from PIL import Image
 import numpy as np
+import os
+import dotenv
 
-# ✅ Connect to MongoDB
-MONGO_URI = "mongodb+srv://admin:securepassword123@cluster0.gynkk.mongodb.net/gatepassDB?retryWrites=true&w=majority&appName=Cluster0"
+# ✅ Load .env from backend
+dotenv.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "backend", ".env"))
+MONGO_URI = os.getenv("MONGO_URI")
+
 client = pymongo.MongoClient(MONGO_URI)
-db = client['gatepassDB']  # your db name
-students = db['students']  # your collection name
+db = client.get_default_database() or client["gatepass"]
+students = db['students']
 
 # ✅ Load FaceNet Model
 print("🔵 Loading FaceNet model...")

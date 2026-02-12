@@ -18,7 +18,10 @@ function cosineSimilarity(vec1, vec2) {
 }
 
 // Threshold (for VGG-Face with cosine similarity)
-const SIMILARITY_THRESHOLD = 0.4;
+// 0.4-0.5 is usually good for real-word conditions
+const SIMILARITY_THRESHOLD = 0.5;
+
+const path = require('path');
 
 exports.verifyFace = async (req, res) => {
   const { scannedImageUrl } = req.body;
@@ -26,7 +29,8 @@ exports.verifyFace = async (req, res) => {
   try {
     const todayIST = getTodayInIST();
     // 1. Get embedding of scanned image using Python
-    const result = spawnSync('python', ['face-verification/verify_face_fast.py', scannedImageUrl]);
+    const scriptPath = path.join(__dirname, '..', '..', 'python-gps', 'verify_face_fast.py');
+    const result = spawnSync('python', [scriptPath, scannedImageUrl]);
     const output = result.stdout.toString();
     const parsed = JSON.parse(output);
 

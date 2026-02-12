@@ -76,19 +76,21 @@ exports.addStudent = async (req, res) => {
         const embedding = await extractEmbedding(imageUrl);
 
         const newStudent = new Student({
-            studentId,
-            name,
-            year,
-            branch,
-            section,
+            studentId: studentId.trim(),
+            name: name.trim(),
+            year: year.trim(),
+            branch: branch.trim(),
+            section: section.trim(),
             imageUrl,
             password, // Let the model hash this in pre-save hook
             embedding
         });
 
         await newStudent.save();
+        console.log(`✅ Student ${studentId.trim()} added successfully`);
         res.status(201).json({ message: 'Student added successfully' });
     } catch (err) {
+        console.error("🔥 Error adding student:", err.message);
         res.status(500).json({ message: 'Failed to add student', error: err.message });
     }
 };
@@ -98,10 +100,16 @@ exports.addDepartment = async (req, res) => {
     try {
         const { deptId, name, password } = req.body;
 
-        const newDept = new Department({ deptId, name, password });
+        const newDept = new Department({
+            deptId: deptId.trim(),
+            name: name.trim(),
+            password: password.trim()
+        });
         await newDept.save();
+        console.log(`✅ HOD ${deptId.trim()} added successfully`);
         res.status(201).json({ message: 'Department added successfully' });
     } catch (err) {
+        console.error("🔥 Error adding department:", err.message);
         res.status(500).json({ message: 'Failed to add department', error: err.message });
     }
 };
@@ -111,10 +119,16 @@ exports.addGuard = async (req, res) => {
     try {
         const { guardId, name, password } = req.body;
 
-        const newGuard = new Guard({ guardId, name, password });
+        const newGuard = new Guard({
+            guardId: guardId.trim(),
+            name: name.trim(),
+            password: password.trim()
+        });
         await newGuard.save();
+        console.log(`✅ Guard ${guardId.trim()} added successfully`);
         res.status(201).json({ message: 'Guard added successfully' });
     } catch (err) {
+        console.error("🔥 Error adding guard:", err.message);
         res.status(500).json({ message: 'Failed to add guard', error: err.message });
     }
 };
@@ -189,12 +203,13 @@ exports.updateStudent = async (req, res) => {
         const { studentId, name, year, branch, section, password } = req.body;
         const file = req.file;
 
-        if (studentId) student.studentId = studentId;
-        if (name) student.name = name;
-        if (year) student.year = year;
-        if (branch) student.branch = branch;
-        if (section) student.section = section;
-        if (password) student.password = password;
+        if (studentId) student.studentId = studentId.trim();
+        if (name) student.name = name.trim();
+        if (year) student.year = year.trim();
+        if (branch) student.branch = branch.trim();
+        if (section) student.section = section.trim();
+        if (password && password.trim()) student.password = password.trim();
+        else if (password === "") { /* do nothing, don't update to empty */ }
 
         if (file) {
             const uploadRes = await cloudinary.uploader.upload(file.path);
@@ -203,8 +218,10 @@ exports.updateStudent = async (req, res) => {
         }
 
         await student.save();
+        console.log(`✅ Student ${student.studentId} updated successfully`);
         res.status(200).json({ message: 'Student updated successfully', student });
     } catch (err) {
+        console.error("🔥 Error updating student:", err.message);
         res.status(500).json({ message: 'Failed to update student', error: err.message });
     }
 };
@@ -217,13 +234,15 @@ exports.updateDepartment = async (req, res) => {
         if (!dept) return res.status(404).json({ message: 'Department not found' });
 
         const { deptId, name, password } = req.body;
-        if (deptId) dept.deptId = deptId;
-        if (name) dept.name = name;
-        if (password) dept.password = password;
+        if (deptId) dept.deptId = deptId.trim();
+        if (name) dept.name = name.trim();
+        if (password && password.trim()) dept.password = password.trim();
 
         await dept.save();
+        console.log(`✅ HOD ${dept.deptId} updated successfully. Password modified: ${!!(password && password.trim())}`);
         res.status(200).json({ message: 'Department updated successfully', dept });
     } catch (err) {
+        console.error("🔥 Error updating department:", err.message);
         res.status(500).json({ message: 'Failed to update department', error: err.message });
     }
 };
@@ -236,13 +255,15 @@ exports.updateGuard = async (req, res) => {
         if (!guard) return res.status(404).json({ message: 'Guard not found' });
 
         const { guardId, name, password } = req.body;
-        if (guardId) guard.guardId = guardId;
-        if (name) guard.name = name;
-        if (password) guard.password = password;
+        if (guardId) guard.guardId = guardId.trim();
+        if (name) guard.name = name.trim();
+        if (password && password.trim()) guard.password = password.trim();
 
         await guard.save();
+        console.log(`✅ Guard ${guard.guardId} updated successfully. Password modified: ${!!(password && password.trim())}`);
         res.status(200).json({ message: 'Guard updated successfully', guard });
     } catch (err) {
+        console.error("🔥 Error updating guard:", err.message);
         res.status(500).json({ message: 'Failed to update guard', error: err.message });
     }
 };

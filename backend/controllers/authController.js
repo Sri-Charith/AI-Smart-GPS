@@ -83,7 +83,7 @@ const login = async (req, res) => {
     const isMatch = await user.matchPassword(password.trim());
 
     if (!isMatch) {
-      console.log(`❌ FAIL: Password mismatch for ${role} "${searchId}"`);
+      console.log(`❌ FAIL: Password mismatch for ${role} "${searchId}" (Expected hash: ${user.password.substring(0, 10)}...)`);
       return res.status(401).json({ message: 'Incorrect password. Please try again.' });
     }
 

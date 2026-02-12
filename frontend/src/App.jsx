@@ -3,7 +3,9 @@ import LandingPage from './pages/LandingPage';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminSignup from './pages/Admin/AdminSignup';
 import AdminDashboard from './pages/Admin/AdminDashboard';
-import PlaceholderDashboard from './pages/PlaceholderDashboard';
+import StudentDashboard from './pages/Student/StudentDashboard';
+import HODDashboard from './pages/HOD/HODDashboard';
+import GuardDashboard from './pages/Guard/GuardDashboard';
 import './App.css';
 
 // Protected Route Component
@@ -39,7 +41,7 @@ function App() {
           path="/student/dashboard"
           element={
             <ProtectedRoute role="student">
-              <PlaceholderDashboard title="Student Dashboard" />
+              <StudentDashboard />
             </ProtectedRoute>
           }
         />
@@ -47,7 +49,7 @@ function App() {
           path="/department/dashboard"
           element={
             <ProtectedRoute role="department">
-              <PlaceholderDashboard title="HOD Dashboard" />
+              <HODDashboard />
             </ProtectedRoute>
           }
         />
@@ -55,7 +57,7 @@ function App() {
           path="/guard/dashboard"
           element={
             <ProtectedRoute role="guard">
-              <PlaceholderDashboard title="Security Dashboard" />
+              <GuardDashboard />
             </ProtectedRoute>
           }
         />

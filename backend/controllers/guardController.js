@@ -33,22 +33,10 @@ exports.getAllRequestsForGuard = async (req, res) => {
   try {
     const nowIST = getISTNow();
 
-    const startIST = new Date(nowIST);
-    startIST.setHours(9, 30, 0, 0);
-
-    const endIST = new Date(nowIST);
-    endIST.setHours(17, 30, 0, 0);
+    const todayStr = nowIST.toISOString().split('T')[0]; // "YYYY-MM-DD"
 
     console.log("⏰ IST Now      :", nowIST.toLocaleString('en-IN'));
-    console.log("🕘 Start Bound :", startIST.toLocaleString('en-IN'));
-    console.log("🕔 End Bound   :", endIST.toLocaleString('en-IN'));
-
-    if (nowIST < startIST || nowIST > endIST) {
-      console.log("⛔ Outside 9:30–5:30 IST, returning empty list");
-      return res.status(200).json({ requests: [] });
-    }
-
-    const todayStr = nowIST.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    console.log("📅 Fetching for :", todayStr);
 
     const requests = await GatePassRequest.find({
       status: 'Approved',

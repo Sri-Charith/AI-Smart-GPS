@@ -3,11 +3,12 @@ from deepface import DeepFace
 import os
 import dotenv
 
-dotenv.load_dotenv()
+dotenv.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "backend", ".env"))
 
 MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
-db = client["gatepassDB"]
+# Get DB name from URI or default to 'gatepass'
+db = client.get_default_database() or client["gatepass"]
 students_collection = db["students"]
 
 students = students_collection.find()
