@@ -33,12 +33,14 @@ const getAllRequests = async (req, res) => {
 const approveRequest = async (req, res) => {
   try {
     const requestId = req.params.id;
+    const { message } = req.body;
     const request = await GatePassRequest.findById(requestId);
     if (!request) {
       return res.status(404).json({ message: 'Request not found' });
     }
 
     request.status = 'Approved';
+    if (message) request.hodMessage = message;
     await request.save();
 
     res.status(200).json({ message: 'Request approved successfully' });
@@ -47,16 +49,19 @@ const approveRequest = async (req, res) => {
   }
 };
 
+
 // Reject a request
 const rejectRequest = async (req, res) => {
   try {
     const requestId = req.params.id;
+    const { message } = req.body;
     const request = await GatePassRequest.findById(requestId);
     if (!request) {
       return res.status(404).json({ message: 'Request not found' });
     }
 
     request.status = 'Rejected';
+    if (message) request.hodMessage = message;
     await request.save();
 
     res.status(200).json({ message: 'Request rejected successfully' });
@@ -64,6 +69,7 @@ const rejectRequest = async (req, res) => {
     res.status(500).json({ message: 'Error rejecting request', error: error.message });
   }
 };
+
 
 function cosineSimilarity(vec1, vec2) {
   const dotProduct = vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
-import { LogOut, CheckCircle2, XCircle, Clock, Search, History, Filter, User, ChevronRight, AlertCircle, Camera, ShieldCheck, Zap, LayoutGrid, ListTodo } from 'lucide-react';
+import { LogOut, CheckCircle2, XCircle, Clock, Search, History, Filter, User, ChevronRight, AlertCircle, Camera, ShieldCheck, Zap, LayoutGrid, ListTodo, MessageSquare, Send } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,7 +12,12 @@ const HODDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('All');
     const [activeTab, setActiveTab] = useState('requests'); // 'requests' or 'history'
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [actionMessage, setActionMessage] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState('');
     const navigate = useNavigate();
+
 
     const fetchRequests = async () => {
         try {
@@ -37,15 +43,33 @@ const HODDashboard = () => {
         fetchRequests();
     }, []);
 
+    const formatTime12h = (time24) => {
+        if (!time24) return '';
+        const [hours, minutes] = time24.split(':');
+        const h = parseInt(hours);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:${minutes} ${ampm}`;
+    };
+
     const handleAction = async (id, status) => {
+        setSelectedRequest(id);
+        setPendingStatus(status);
+        setActionMessage('');
+        setIsModalOpen(true);
+    };
+
+    const confirmAction = async () => {
         try {
-            const endpoint = status === 'Approved' ? `/department/approve/${id}` : `/department/reject/${id}`;
-            await api.put(endpoint);
+            const endpoint = pendingStatus === 'Approved' ? `/department/approve/${selectedRequest}` : `/department/reject/${selectedRequest}`;
+            await api.put(endpoint, { message: actionMessage });
+            setIsModalOpen(false);
             fetchRequests();
         } catch (err) {
             alert('Error updating request status');
         }
     };
+
 
     const handleLogout = () => {
         localStorage.removeItem('departmentToken');
@@ -131,8 +155,8 @@ const HODDashboard = () => {
                                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
                                     <input
                                         type="text"
-                                        placeholder="SEARCH STUDENT NAME OR ID..."
-                                        className="w-full pl-14 pr-6 py-4 bg-black/40 border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                        placeholder="Search student name or ID..."
+                                        className="w-full pl-14 pr-6 py-4 bg-black/40 border border-white/5 rounded-2xl text-[10px] font-black tracking-widest outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -202,7 +226,7 @@ const HODDashboard = () => {
                                                     <div className="flex items-center gap-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                                                         <span>ID: {req.student?.studentId}</span>
                                                         <span className="text-slate-800">//</span>
-                                                        <span>{req.date} @ {req.time}</span>
+                                                        <span>{req.date} @ {formatTime12h(req.time)}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -252,7 +276,79 @@ const HODDashboard = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Status Action Modal */}
+                <AnimatePresence>
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsModalOpen(false)}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="relative w-full max-w-lg glass-morphism rounded-[2.5rem] border border-white/10 p-10 shadow-2xl overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+                                <div className="relative z-10 space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${pendingStatus === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                            {pendingStatus === 'Approved' ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-black uppercase tracking-tighter italic">
+                                                Confirm {pendingStatus}
+                                            </h2>
+                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">
+                                                Add an optional message for the student
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1 italic">// HOD Message</label>
+                                        <div className="relative">
+                                            <MessageSquare className="absolute left-5 top-5 text-slate-600" size={18} />
+                                            <textarea
+                                                placeholder="Enter reason or instructions..."
+                                                className="w-full bg-black/40 border border-white/5 rounded-3xl py-5 pl-14 pr-6 text-xs font-bold tracking-widest outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800 min-h-[120px] resize-none"
+                                                value={actionMessage}
+                                                onChange={(e) => setActionMessage(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={() => setIsModalOpen(false)}
+                                            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-500 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border border-white/5"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={confirmAction}
+                                            className={`flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-xl ${pendingStatus === 'Approved'
+                                                    ? 'neon-bg-indigo text-white shadow-indigo-600/20'
+                                                    : 'bg-rose-600 text-white shadow-rose-600/20 hover:bg-rose-700 font-bold'
+                                                }`}
+                                        >
+                                            <Send size={14} />
+                                            Submit {pendingStatus}
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </main>
+
         </div>
     );
 };

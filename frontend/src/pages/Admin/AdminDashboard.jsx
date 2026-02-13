@@ -447,7 +447,7 @@ const AdminDashboard = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Student ID</label>
                                             <input
-                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                 placeholder="ENT_ROLL_ID"
                                                 value={studentData.studentId}
                                                 onChange={e => setStudentData({ ...studentData, studentId: e.target.value })}
@@ -457,7 +457,7 @@ const AdminDashboard = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Student Name</label>
                                             <input
-                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                 placeholder="FULL NAME"
                                                 value={studentData.name}
                                                 onChange={e => setStudentData({ ...studentData, name: e.target.value })}
@@ -467,7 +467,7 @@ const AdminDashboard = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Branch</label>
                                             <input
-                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                 placeholder="E.G. CSE, ECE"
                                                 value={studentData.branch}
                                                 onChange={e => setStudentData({ ...studentData, branch: e.target.value })}
@@ -478,7 +478,7 @@ const AdminDashboard = () => {
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Year</label>
                                                 <input
-                                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                     placeholder="YEAR"
                                                     value={studentData.year}
                                                     onChange={e => setStudentData({ ...studentData, year: e.target.value })}
@@ -488,7 +488,7 @@ const AdminDashboard = () => {
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Section</label>
                                                 <input
-                                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                     placeholder="SECTION"
                                                     value={studentData.section}
                                                     onChange={e => setStudentData({ ...studentData, section: e.target.value })}
@@ -500,7 +500,7 @@ const AdminDashboard = () => {
                                             <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Access Key</label>
                                             <input
                                                 type="password"
-                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                                 placeholder="••••••••"
                                                 value={studentData.password}
                                                 onChange={e => setStudentData({ ...studentData, password: e.target.value })}
@@ -518,7 +518,7 @@ const AdminDashboard = () => {
                                                 />
                                                 <label
                                                     htmlFor="img-upload"
-                                                    className="flex items-center gap-4 w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer hover:bg-white/5 transition-all text-slate-500"
+                                                    className="flex items-center gap-4 w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] cursor-pointer hover:bg-white/5 transition-all text-slate-500"
                                                 >
                                                     <Upload size={14} /> {studentData.photo ? studentData.photo.name : 'UPLOAD STUDENT PHOTO'}
                                                 </label>
@@ -583,7 +583,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Department ID</label>
                                         <input
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="DEP_DESIGNATION_ID"
                                             value={deptData.deptId}
                                             onChange={e => setDeptData({ ...deptData, deptId: e.target.value })}
@@ -593,7 +593,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// HOD Name</label>
                                         <input
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="FULL NAME"
                                             value={deptData.name}
                                             onChange={e => setDeptData({ ...deptData, name: e.target.value })}
@@ -604,7 +604,7 @@ const AdminDashboard = () => {
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Password</label>
                                         <input
                                             type="password"
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="••••••••"
                                             value={deptData.password}
                                             onChange={e => setDeptData({ ...deptData, password: e.target.value })}
@@ -668,7 +668,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Guard ID</label>
                                         <input
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="SNT_BADGE_ID"
                                             value={guardData.guardId}
                                             onChange={e => setGuardData({ ...guardData, guardId: e.target.value })}
@@ -678,7 +678,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Guard Name</label>
                                         <input
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="FULL NAME"
                                             value={guardData.name}
                                             onChange={e => setGuardData({ ...guardData, name: e.target.value })}
@@ -689,7 +689,7 @@ const AdminDashboard = () => {
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Password</label>
                                         <input
                                             type="password"
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-800"
                                             placeholder="••••••••"
                                             value={guardData.password}
                                             onChange={e => setGuardData({ ...guardData, password: e.target.value })}

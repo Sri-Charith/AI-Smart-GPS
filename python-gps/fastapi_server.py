@@ -1,11 +1,23 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
+import warnings
+warnings.filterwarnings('ignore')  # Suppress all warnings
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from deepface import DeepFace
 import numpy as np
 import cv2
 import uvicorn
 from pydantic import BaseModel
+import logging
+
+# Suppress logging for specific libraries
+logging.getLogger("tensorflow").setLevel(logging.ERROR)
+logging.getLogger("uvicorn.error").setLevel(logging.ERROR)
+logging.getLogger("uvicorn.access").setLevel(logging.ERROR)
 
 app = FastAPI()
+
 
 class UrlRequest(BaseModel):
     url: str
@@ -57,4 +69,4 @@ async def extract_from_url(request: UrlRequest):
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="error")

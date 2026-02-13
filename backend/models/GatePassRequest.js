@@ -8,7 +8,7 @@ const gatePassRequestSchema = new mongoose.Schema({
   },
   reason: { type: String, required: true },
   date: { type: String, },   // format: YYYY-MM-DD
-  time: { type: String,  },   // format: HH:MM
+  time: { type: String, },   // format: HH:MM
   status: {
     type: String,
     enum: ['Pending', 'Approved', 'Rejected', 'Left Campus'],
@@ -21,8 +21,13 @@ const gatePassRequestSchema = new mongoose.Schema({
   leftAt: {
     type: Date,
     default: null
+  },
+  hodMessage: {
+    type: String,
+    default: ""
   }
-  
+
 });
+
 
 module.exports = mongoose.model('GatePassRequest', gatePassRequestSchema);

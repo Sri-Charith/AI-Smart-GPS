@@ -66,6 +66,15 @@ const GuardDashboard = () => {
         };
     }, [activeTab]);
 
+    const formatTime12h = (time24) => {
+        if (!time24) return '';
+        const [hours, minutes] = time24.split(':');
+        const h = parseInt(hours);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:${minutes} ${ampm}`;
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('guardToken');
         navigate('/');
@@ -101,7 +110,7 @@ const GuardDashboard = () => {
 
             setScanResult({ success: true, ...verifyRes.data });
             fetchRequests();
-            setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString() }, ...prev]);
+            setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) }, ...prev]);
         } catch (err) {
             setScanResult({ success: false, message: err.response?.data?.message || 'Verification Failed' });
         } finally {
@@ -127,7 +136,7 @@ const GuardDashboard = () => {
 
             setScanResult({ success: true, ...verifyRes.data });
             fetchRequests();
-            setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString() }, ...prev]);
+            setHistory(prev => [{ ...verifyRes.data, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) }, ...prev]);
         } catch (err) {
             setScanResult({ success: false, message: err.response?.data?.message || 'Verification Failed' });
         } finally {
@@ -382,7 +391,7 @@ const GuardDashboard = () => {
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <p className="text-xs font-black text-emerald-500 uppercase tracking-widest leading-none">Status: EXITED</p>
-                                                    <p className="text-[10px] font-black text-slate-500 mt-2 uppercase">Time: {req.leftAt ? new Date(req.leftAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
+                                                    <p className="text-[10px] font-black text-slate-500 mt-2 uppercase">Time: {req.leftAt ? new Date(req.leftAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : 'N/A'}</p>
                                                 </div>
                                                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
                                                     <ShieldCheck size={20} />
@@ -391,7 +400,7 @@ const GuardDashboard = () => {
                                         ) : (
                                             <>
                                                 <div className="text-right hidden sm:block">
-                                                    <p className="text-lg font-black tracking-tighter italic leading-none">{req.time}</p>
+                                                    <p className="text-lg font-black tracking-tighter italic leading-none">{formatTime12h(req.time)}</p>
                                                     <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mt-1 italic">ETA EXIT</p>
                                                 </div>
                                                 <div className="w-[1px] h-12 bg-white/5 hidden sm:block" />

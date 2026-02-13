@@ -67,8 +67,8 @@ const AdminSignup = () => {
                             <User className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-indigo-400 transition-colors" size={20} />
                             <input
                                 type="text"
-                                placeholder="IDENTIFIER"
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-5 pl-16 pr-6 text-xs font-black uppercase tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                placeholder="Identifier"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-5 pl-16 pr-6 text-xs font-black tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required
@@ -83,7 +83,7 @@ const AdminSignup = () => {
                             <input
                                 type="password"
                                 placeholder="••••••••"
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-5 pl-16 pr-6 text-xs font-black uppercase tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-5 pl-16 pr-6 text-xs font-black tracking-widest text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-800"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required

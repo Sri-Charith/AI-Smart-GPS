@@ -1,8 +1,9 @@
 const dotenv = require('dotenv');
 dotenv.config();
-const express = require('express');
 
+const express = require('express');
 const connectDB = require('./config/db');
+
 const studentRoutes = require('./routes/studentRoutes');
 const authRoutes = require('./routes/authRoutes');
 const gatepassRoutes = require('./routes/gatepassRoutes');
@@ -52,9 +53,12 @@ const startAIServer = () => {
 };
 
 app.listen(PORT, () => {
-    console.log(`✅ Main Server running on port ${PORT}`);
+    console.clear();
+    console.log("\x1b[36m%s\x1b[0m", "-----------------------------------------");
+    console.log("\x1b[32m%s\x1b[0m", "🚀 GATEPASS SYSTEM IS ONLINE");
+    console.log("\x1b[36m%s\x1b[0m", "-----------------------------------------");
+    console.log(`📡 Main Server : http://localhost:${PORT}`);
+    console.log(`🔑 JWT Status  : ${process.env.JWT_SECRET ? "✅ Secure" : "❌ Missing"}`);
+    console.log("\x1b[36m%s\x1b[0m", "-----------------------------------------");
     startAIServer();
 });
-
-console.log("✅ Guard routes loaded");
-console.log("🔑 JWT_SECRET status:", process.env.JWT_SECRET ? "✅ Loaded" : "❌ Missing");

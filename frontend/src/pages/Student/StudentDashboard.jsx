@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
-import { LogOut, Send, Clock, Trash2, CheckCircle2, XCircle, ShieldCheck, Shield, GraduationCap, History, Info, Loader2 } from 'lucide-react';
+import { LogOut, Send, Clock, Trash2, CheckCircle2, XCircle, ShieldCheck, Shield, GraduationCap, History, Info, Loader2, MessageSquare } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,7 +11,9 @@ const StudentDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [reason, setReason] = useState('');
     const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
+    const [selectedHour, setSelectedHour] = useState('12');
+    const [selectedMinute, setSelectedMinute] = useState('00');
+    const [selectedAmPm, setSelectedAmPm] = useState('PM');
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -20,6 +23,15 @@ const StudentDashboard = () => {
         fetchProfile();
         fetchRequests();
     }, []);
+
+    const formatTime12h = (time24) => {
+        if (!time24) return '';
+        const [hours, minutes] = time24.split(':');
+        const h = parseInt(hours);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:${minutes} ${ampm}`;
+    };
 
     const fetchProfile = async () => {
         try {
@@ -52,10 +64,17 @@ const StudentDashboard = () => {
         setSubmitting(true);
         setMessage({ type: '', text: '' });
 
+        // Assemble 24h time for backend
+        let h = parseInt(selectedHour);
+        if (selectedAmPm === 'PM' && h < 12) h += 12;
+        if (selectedAmPm === 'AM' && h === 12) h = 0;
+        const formattedTime = `${h.toString().padStart(2, '0')}:${selectedMinute}`;
+
         try {
-            await api.post('/gatepass/request', { reason, date, time });
+            await api.post('/gatepass/request', { reason, date, time: formattedTime });
             setMessage({ type: 'success', text: 'Gate pass request submitted successfully.' });
-            setReason(''); setDate(''); setTime('');
+            setReason(''); setDate('');
+            setSelectedHour('12'); setSelectedMinute('00'); setSelectedAmPm('PM');
             fetchRequests();
         } catch (err) {
             setMessage({ type: 'error', text: err.response?.data?.message || 'Submission failed.' });
@@ -192,8 +211,8 @@ const StudentDashboard = () => {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 italic">// Reason</label>
                                     <input
                                         type="text"
-                                        placeholder="REASON FOR EXIT"
-                                        className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-xs font-bold uppercase tracking-widest focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-slate-800"
+                                        placeholder="Reason for exit"
+                                        className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-xs font-bold tracking-widest focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-slate-800"
                                         value={reason}
                                         onChange={(e) => setReason(e.target.value)}
                                         required
@@ -212,13 +231,34 @@ const StudentDashboard = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 italic">// Time</label>
-                                        <input
-                                            type="time"
-                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
-                                            value={time}
-                                            onChange={(e) => setTime(e.target.value)}
-                                            required
-                                        />
+                                        <div className="flex gap-2">
+                                            <select
+                                                className="flex-1 bg-black/40 border border-white/5 rounded-2xl py-4 px-3 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all appearance-none cursor-pointer text-center"
+                                                value={selectedHour}
+                                                onChange={(e) => setSelectedHour(e.target.value)}
+                                            >
+                                                {Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0')).map(h => (
+                                                    <option key={h} value={h} className="bg-[#030305]">{h}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                className="flex-1 bg-black/40 border border-white/5 rounded-2xl py-4 px-3 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all appearance-none cursor-pointer text-center"
+                                                value={selectedMinute}
+                                                onChange={(e) => setSelectedMinute(e.target.value)}
+                                            >
+                                                {Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')).map(m => (
+                                                    <option key={m} value={m} className="bg-[#030305]">{m}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                className="w-20 bg-black/40 border border-white/5 rounded-2xl py-4 px-3 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-pink-500/20 outline-none transition-all appearance-none cursor-pointer text-center text-pink-500"
+                                                value={selectedAmPm}
+                                                onChange={(e) => setSelectedAmPm(e.target.value)}
+                                            >
+                                                <option value="AM" className="bg-[#030305]">AM</option>
+                                                <option value="PM" className="bg-[#030305]">PM</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -284,7 +324,7 @@ const StudentDashboard = () => {
                                                 <div>
                                                     <h4 className="text-lg font-black tracking-tighter uppercase italic group-hover:text-indigo-400 transition-colors uppercase">{req.reason}</h4>
                                                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-1">
-                                                        Timecode: <span className="text-slate-400">{req.date} @ {req.time}</span>
+                                                        Timecode: <span className="text-slate-400">{req.date} @ {formatTime12h(req.time)}</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -303,6 +343,22 @@ const StudentDashboard = () => {
                                                 )}
                                             </div>
                                         </div>
+
+                                        {/* HOD Message Display */}
+                                        {req.hodMessage && (
+                                            <div className="mt-6 pt-6 border-t border-white/5 flex gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+                                                    <MessageSquare size={16} />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Message from HOD</p>
+                                                    <p className="text-xs font-medium text-slate-300 italic leading-relaxed">
+                                                        "{req.hodMessage}"
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* HUD Line Decoration */}
                                         <div className="absolute top-0 right-0 w-24 h-[1px] bg-gradient-to-l from-indigo-500/20 to-transparent" />
                                     </motion.div>
