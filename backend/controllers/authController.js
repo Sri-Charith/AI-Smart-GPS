@@ -9,7 +9,8 @@ const generateToken = (payload) => {
 };
 
 const signup = async (req, res) => {
-  const { role, id, password, name, branch, year, section } = req.body;
+  const { role, id, password, name, branch, year, section, department } = req.body;
+
 
   try {
     if (!role) return res.status(400).json({ message: 'Role is required' });
@@ -26,7 +27,7 @@ const signup = async (req, res) => {
     } else if (role === 'department') {
       const existing = await Department.findOne({ deptId: id });
       if (existing) return res.status(400).json({ message: 'Department already exists' });
-      user = new Department({ deptId: id, name, password });
+      user = new Department({ deptId: id, name, password, department });
     } else if (role === 'guard') {
       const existing = await Guard.findOne({ guardId: id });
       if (existing) return res.status(400).json({ message: 'Guard already exists' });

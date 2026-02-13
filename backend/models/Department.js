@@ -4,7 +4,8 @@ const bcrypt = require('bcryptjs');
 const departmentSchema = new mongoose.Schema({
   deptId: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  name: { type: String, required: true }
+  name: { type: String, required: true },
+  department: { type: String, required: true }
 });
 
 // Hash password before saving

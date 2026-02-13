@@ -39,11 +39,13 @@ const AdminDashboard = () => {
     const [submitting, setSubmitting] = useState(false);
     const [refreshingId, setRefreshingId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
+
 
     // Form States
     const [studentData, setStudentData] = useState({ studentId: '', name: '', branch: '', year: '', section: '', password: '', photo: null });
-    const [deptData, setDeptData] = useState({ deptId: '', name: '', password: '' });
+    const [deptData, setDeptData] = useState({ deptId: '', name: '', password: '', department: '' });
     const [guardData, setGuardData] = useState({ guardId: '', name: '', password: '' });
 
     // Edit States
@@ -89,19 +91,21 @@ const AdminDashboard = () => {
     };
 
     const handleDelete = async (role, id) => {
-        if (window.confirm(`Are you sure you want to delete this ${role}?`)) {
+        if (window.confirm(`Are you sure you want to delete this ${role === 'dept' ? 'HOD' : role}?`)) {
             try {
-                const endpoint = role === 'dept' ? `/ admin / department / ${id} ` : ` / admin / ${role}/${id}`;
+                const endpoint = role === 'dept' ? `/admin/department/${id}` : `/admin/${role}/${id}`;
                 await api.delete(endpoint);
                 showSuccess(`${role === 'dept' ? 'HOD' : role.charAt(0).toUpperCase() + role.slice(1)} removed from system.`);
                 if (role === 'student') fetchStudents();
                 else if (role === 'dept') fetchDepartments();
                 else fetchGuards();
             } catch (err) {
-                console.error(err);
+                console.error("Delete failed:", err);
+                alert(err.response?.data?.message || 'Deletion failed');
             }
         }
     };
+
 
     const handleRefreshEmbedding = async (studentId) => {
         setRefreshingId(studentId);
@@ -135,7 +139,7 @@ const AdminDashboard = () => {
 
     const startEditDept = (dept) => {
         setEditingDeptId(dept._id);
-        setDeptData({ deptId: dept.deptId, name: dept.name, password: '' });
+        setDeptData({ deptId: dept.deptId, name: dept.name, password: '', department: dept.department || '' });
         setActiveTab('add-dept');
     };
 
@@ -180,7 +184,7 @@ const AdminDashboard = () => {
                 await api.post('/admin/add-department', deptData);
                 showSuccess('New HOD added successfully.');
             }
-            setDeptData({ deptId: '', name: '', password: '' });
+            setDeptData({ deptId: '', name: '', password: '', department: '' });
             setEditingDeptId(null);
             fetchDepartments();
             setActiveTab('view-depts');
@@ -262,10 +266,13 @@ const AdminDashboard = () => {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={14} />
                         <input
                             placeholder="SEARCH..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             className="bg-black/40 border border-white/5 rounded-xl pl-10 pr-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all placeholder:text-slate-800"
                         />
                     </div>
                 </div>
+
             </div>
             <div className="p-4 overflow-x-auto">
                 {children}
@@ -375,7 +382,13 @@ const AdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="space-y-4">
-                                        {students.map((s, idx) => (
+                                        {students.filter(s =>
+                                            s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            s.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            s.branch?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        ).map((s, idx) => (
+
+
                                             <motion.tr
                                                 initial={{ opacity: 0, x: -10 }}
                                                 animate={{ opacity: 1, x: 0 }}
@@ -544,12 +557,19 @@ const AdminDashboard = () => {
                                         <tr className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 px-6">
                                             <th className="pb-4 pl-6">HOD Name</th>
                                             <th className="pb-4">Department ID</th>
+                                            <th className="pb-4">Dept Name</th>
                                             <th className="pb-4">Access Level</th>
                                             <th className="pb-4 pr-6 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="space-y-4">
-                                        {departments.map((d, idx) => (
+                                        {departments.filter(d =>
+                                            d.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            d.deptId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            d.department?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        ).map((d, idx) => (
+
+
                                             <motion.tr
                                                 initial={{ opacity: 0, x: -10 }}
                                                 animate={{ opacity: 1, x: 0 }}
@@ -559,6 +579,7 @@ const AdminDashboard = () => {
                                             >
                                                 <td className="py-6 px-6 first:rounded-l-[2rem] font-black uppercase italic text-sm tracking-tight">{d.name}</td>
                                                 <td className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{d.deptId}</td>
+                                                <td className="text-[10px] font-black uppercase tracking-widest text-slate-400">{d.department}</td>
                                                 <td className="text-xs font-black uppercase tracking-widest text-slate-600 text-[8px] italic tracking-[0.2em]">// [ Level.02 ]</td>
                                                 <td className="py-6 px-6 last:rounded-r-[2rem] text-right">
                                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
@@ -601,6 +622,16 @@ const AdminDashboard = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Department (Branch)</label>
+                                        <input
+                                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-[10px] font-black tracking-[0.2em] outline-none focus:ring-2 focus:ring-pink-500/20 transition-all placeholder:text-slate-800"
+                                            placeholder="E.G. CSE, ECE"
+                                            value={deptData.department}
+                                            onChange={e => setDeptData({ ...deptData, department: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 italic">// Password</label>
                                         <input
                                             type="password"
@@ -634,7 +665,12 @@ const AdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="space-y-4">
-                                        {guards.map((g, idx) => (
+                                        {guards.filter(g =>
+                                            g.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            g.guardId?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        ).map((g, idx) => (
+
+
                                             <motion.tr
                                                 initial={{ opacity: 0, x: -10 }}
                                                 animate={{ opacity: 1, x: 0 }}

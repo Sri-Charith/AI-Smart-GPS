@@ -16,15 +16,28 @@ const getDepartmentProfile = async (req, res) => {
   }
 };
 
-// Get all gate pass requests with student details
+// Get all gate pass requests with student details (Filtered by HOD Department)
 const getAllRequests = async (req, res) => {
   try {
-    const requests = await GatePassRequest.find()
+    // 1. Get the current HOD's department
+    const hod = await Department.findById(req.department.id);
+    if (!hod || !hod.department) {
+      return res.status(404).json({ message: 'HOD Department not configured' });
+    }
+
+    // 2. Find all students belonging to this department (branch)
+    // Note: In student model it's 'branch', in HOD model it's 'department'
+    const studentsInDept = await Student.find({ branch: hod.department }).select('_id');
+    const studentIds = studentsInDept.map(s => s._id);
+
+    // 3. Find requests only for these students
+    const requests = await GatePassRequest.find({ student: { $in: studentIds } })
       .populate('student', 'studentId name branch year section imageUrl')
       .sort({ createdAt: -1 });
 
     res.status(200).json({ requests });
   } catch (error) {
+    console.error("🔥 Error fetching department-specific requests:", error.message);
     res.status(500).json({ message: 'Error fetching requests', error: error.message });
   }
 };

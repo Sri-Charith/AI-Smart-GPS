@@ -98,12 +98,13 @@ exports.addStudent = async (req, res) => {
 // 🧑‍🏫 Add Department
 exports.addDepartment = async (req, res) => {
     try {
-        const { deptId, name, password } = req.body;
+        const { deptId, name, password, department } = req.body;
 
         const newDept = new Department({
             deptId: deptId.trim(),
             name: name.trim(),
-            password: password.trim()
+            password: password.trim(),
+            department: department ? department.trim() : ""
         });
         await newDept.save();
         console.log(`✅ HOD ${deptId.trim()} added successfully`);
@@ -163,15 +164,22 @@ exports.getAllGuards = async (req, res) => {
     }
 };
 
+const GatePassRequest = require('../models/GatePassRequest');
+
 // 🗑 Delete Student
 exports.deleteStudent = async (req, res) => {
     try {
-        await Student.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Student deleted successfully' });
+        const studentId = req.params.id;
+        await Student.findByIdAndDelete(studentId);
+        // Cascading delete for requests
+        await GatePassRequest.deleteMany({ student: studentId });
+
+        res.status(200).json({ message: 'Student and associated requests deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: 'Failed to delete student', error: err.message });
     }
 };
+
 
 // 🗑 Delete Department
 exports.deleteDepartment = async (req, res) => {
@@ -233,9 +241,10 @@ exports.updateDepartment = async (req, res) => {
         const dept = await Department.findById(id);
         if (!dept) return res.status(404).json({ message: 'Department not found' });
 
-        const { deptId, name, password } = req.body;
+        const { deptId, name, password, department } = req.body;
         if (deptId) dept.deptId = deptId.trim();
         if (name) dept.name = name.trim();
+        if (department) dept.department = department.trim();
         if (password && password.trim()) dept.password = password.trim();
 
         await dept.save();
